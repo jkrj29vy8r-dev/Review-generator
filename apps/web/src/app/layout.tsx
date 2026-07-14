@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { I18nProvider } from "@/i18n/context";
+import { SmoothScroll } from "@/components/layout/smooth-scroll";
 import "./globals.css";
 
 const inter = Inter({
@@ -54,7 +55,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <I18nProvider>
-              {children}
+              <SmoothScroll>
+                {children}
+              </SmoothScroll>
               <Toaster />
             </I18nProvider>
           </ThemeProvider>
