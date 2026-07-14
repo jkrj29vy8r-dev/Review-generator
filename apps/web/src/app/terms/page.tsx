@@ -12,7 +12,7 @@ export default function TermsPage() {
         <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">1. Serviciul</h2>
-            <p>AI Review Manager oferă o platformă SaaS pentru gestionarea și răspunderea automată la recenziile Google Business, utilizând tehnologie AI (GPT-4o).</p>
+            <p>Replai oferă o platformă SaaS pentru gestionarea și răspunderea automată la recenziile Google Business, utilizând tehnologie AI (GPT-4o).</p>
           </section>
 
           <section>
@@ -27,7 +27,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">4. Limitarea răspunderii</h2>
-            <p>Răspunsurile generate de AI sunt sugestii. Utilizatorul este responsabil pentru conținutul publicat pe Google. AI Review Manager nu garantează rezultate specifice în rating sau recenzii.</p>
+            <p>Răspunsurile generate de AI sunt sugestii. Utilizatorul este responsabil pentru conținutul publicat pe Google. Replai nu garantează rezultate specifice în rating sau recenzii.</p>
           </section>
 
           <section>

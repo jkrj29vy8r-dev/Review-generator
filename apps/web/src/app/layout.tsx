@@ -15,13 +15,13 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "AI Review Manager — Răspunzuri inteligente la recenzii Google",
-    template: "%s | AI Review Manager",
+    default: "Replai — Smart replies. Happy customers.",
+    template: "%s | Replai",
   },
   description:
     "Platformă AI premium pentru gestionarea și răspunderea automată la recenziile Google Business. Economisești timp, îmbunătățești ratingul.",
   keywords: ["AI", "recenzii Google", "review manager", "răspuns automat", "Google Business"],
-  authors: [{ name: "AI Review Manager" }],
+  authors: [{ name: "Replai" }],
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL || "https://aireviewmanager.ro"
   ),
@@ -29,13 +29,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ro_RO",
     url: "/",
-    siteName: "AI Review Manager",
-    title: "AI Review Manager — Răspunzuri inteligente la recenzii Google",
+    siteName: "Replai",
+    title: "Replai — Smart replies. Happy customers.",
     description: "Platformă AI premium pentru gestionarea recenziilor Google",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Review Manager",
+    title: "Replai",
     description: "Platformă AI premium pentru gestionarea recenziilor Google",
   },
 };

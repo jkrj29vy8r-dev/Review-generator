@@ -109,7 +109,7 @@ export function Sidebar() {
                 exit={{ opacity: 0, x: -10 }}
                 className="min-w-0 overflow-hidden"
               >
-                <p className="font-bold text-sm truncate">AI Review Manager</p>
+                <p className="font-bold text-sm truncate">Replai</p>
                 <p className="text-[11px] text-brand-400 truncate flex items-center gap-1">
                   <Sparkles className="w-2.5 h-2.5" />
                   Pro Plan Active

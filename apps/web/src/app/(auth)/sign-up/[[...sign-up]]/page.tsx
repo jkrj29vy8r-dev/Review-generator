@@ -23,7 +23,7 @@ export default function SignUpPage() {
           <div className="w-9 h-9 rounded-lg bg-white/10 backdrop-blur flex items-center justify-center border border-white/20">
             <Star className="w-5 h-5 text-white fill-white" />
           </div>
-          <span className="font-bold text-white text-xl">AI Review Manager</span>
+          <span className="font-bold text-white text-xl">Replai</span>
         </Link>
 
         <div className="relative z-10">
@@ -65,7 +65,7 @@ export default function SignUpPage() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center">
                 <Star className="w-4 h-4 text-white fill-white" />
               </div>
-              <span className="font-bold text-lg">AI Review Manager</span>
+              <span className="font-bold text-lg">Replai</span>
             </Link>
             <h1 className="text-2xl font-bold mb-2">Creează cont gratuit</h1>
             <p className="text-muted-foreground">

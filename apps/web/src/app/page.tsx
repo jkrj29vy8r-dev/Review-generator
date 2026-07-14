@@ -166,7 +166,7 @@ function NavBar() {
             <Star className="w-5 h-5 text-white fill-white" />
           </motion.div>
           <span className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-            AI Review Manager
+            Replai
           </span>
         </Link>
 
@@ -835,9 +835,9 @@ export default function LandingPage() {
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center">
               <Star className="w-3.5 h-3.5 text-white fill-white" />
             </div>
-            <span className="font-semibold">AI Review Manager</span>
+            <span className="font-semibold">Replai</span>
           </Link>
-          <p className="text-sm text-muted-foreground">© 2026 AI Review Manager. Toate drepturile rezervate.</p>
+          <p className="text-sm text-muted-foreground">© 2026 Replai. Toate drepturile rezervate.</p>
           <div className="flex gap-5 text-sm text-muted-foreground">
             {["Confidențialitate", "Termeni", "Contact"].map((link) => (
               <Link key={link} href={`/${link.toLowerCase()}`} className="hover:text-foreground transition-colors">
