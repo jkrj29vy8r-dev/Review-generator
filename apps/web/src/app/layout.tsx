@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { I18nProvider } from "@/i18n/context";
 import "./globals.css";
 
 const inter = Inter({
@@ -52,8 +53,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
-            <Toaster />
+            <I18nProvider>
+              {children}
+              <Toaster />
+            </I18nProvider>
           </ThemeProvider>
         </body>
       </html>

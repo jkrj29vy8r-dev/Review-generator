@@ -21,46 +21,17 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useSidebarStore } from "@/store/sidebar-store";
+import { useI18n } from "@/i18n/context";
+import { type TranslationKey } from "@/i18n/translations";
 
-const navItems = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Recenzii",
-    href: "/reviews",
-    icon: MessageSquare,
-    badge: "12",
-  },
-  {
-    label: "Afaceri",
-    href: "/businesses",
-    icon: Building2,
-  },
-  {
-    label: "Statistici",
-    href: "/analytics",
-    icon: BarChart3,
-  },
-  {
-    label: "Notificări",
-    href: "/notifications",
-    icon: Bell,
-    badge: "3",
-  },
-  {
-    label: "Setări",
-    href: "/settings",
-    icon: Settings,
-  },
-  {
-    label: "Admin Panel",
-    href: "/admin",
-    icon: Shield,
-    adminOnly: true,
-  },
+const navItems: { labelKey: TranslationKey; href: string; icon: React.ElementType; badge?: string; adminOnly?: boolean }[] = [
+  { labelKey: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { labelKey: "nav.reviews", href: "/reviews", icon: MessageSquare, badge: "12" },
+  { labelKey: "nav.businesses", href: "/businesses", icon: Building2 },
+  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3 },
+  { labelKey: "nav.notifications", href: "/notifications", icon: Bell, badge: "3" },
+  { labelKey: "nav.settings", href: "/settings", icon: Settings },
+  { labelKey: "nav.admin", href: "/admin", icon: Shield, adminOnly: true },
 ];
 
 const businesses = [
@@ -73,6 +44,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const [businessExpanded, setBusinessExpanded] = useState(true);
   const { isOpen } = useSidebarStore();
+  const { t } = useI18n();
 
   return (
     <>
@@ -121,7 +93,7 @@ export function Sidebar() {
             <div className="h-1.5 bg-brand-500/20 rounded-full overflow-hidden">
               <div className="h-full w-1/3 bg-gradient-to-r from-brand-500 to-violet-500 rounded-full" />
             </div>
-            <p className="text-xs text-muted-foreground mt-1.5">127 răspunsuri luna aceasta</p>
+            <p className="text-xs text-muted-foreground mt-1.5">127 {t("nav.reviews").toLowerCase()} luna aceasta</p>
           </div>
         </div>
 
@@ -150,7 +122,7 @@ export function Sidebar() {
                     isActive ? "text-brand-400" : ""
                   )}
                 />
-                <span className="flex-1">{item.label}</span>
+                <span className="flex-1">{t(item.labelKey)}</span>
                 {item.badge && (
                   <Badge
                     variant="secondary"
@@ -174,7 +146,7 @@ export function Sidebar() {
               onClick={() => setBusinessExpanded(!businessExpanded)}
               className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              <span>AFACERI MELE</span>
+              <span>{t("nav.businesses").toUpperCase()}</span>
               <ChevronDown
                 className={cn(
                   "w-3 h-3 transition-transform duration-200",
@@ -216,7 +188,7 @@ export function Sidebar() {
                     >
                       <Link href="/businesses/new">
                         <Plus className="w-3.5 h-3.5" />
-                        Adaugă afacere
+                        + {t("nav.businesses")}
                       </Link>
                     </Button>
                   </div>
@@ -233,7 +205,7 @@ export function Sidebar() {
             className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
           >
             <Settings className="w-4 h-4" />
-            <span>Setări cont</span>
+            <span>{t("settings.title")}</span>
           </Link>
         </div>
       </motion.aside>

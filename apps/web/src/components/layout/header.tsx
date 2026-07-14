@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useSidebarStore } from "@/store/sidebar-store";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { useI18n } from "@/i18n/context";
 import Link from "next/link";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
   const { toggle } = useSidebarStore();
+  const { t } = useI18n();
 
   return (
     <header className="h-16 border-b border-border/50 flex items-center justify-between px-6 bg-background/80 glass sticky top-0 z-20">
@@ -28,7 +31,7 @@ export function Header() {
         <div className="relative hidden md:flex items-center">
           <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Caută recenzii, afaceri..."
+            placeholder={t("reviews.search")}
             className="pl-9 w-64 h-9 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-brand-500/50"
           />
         </div>
@@ -40,6 +43,9 @@ export function Header() {
           <Sparkles className="w-3 h-3" />
           Pro Plan
         </Badge>
+
+        {/* Language switcher */}
+        <LanguageSwitcher />
 
         {/* Theme toggle */}
         <Button
