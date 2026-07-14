@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs";
 import OpenAI from "openai";
 import { getLanguageInstruction, LANGUAGE_MAP } from "@/lib/languages";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 
 const TONE_DESCRIPTIONS: Record<string, string> = {
   PROFESIONAL: "professional and respectful",
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const {
     reviewText,
     rating,
@@ -138,7 +139,8 @@ VARIANT 3:
 
     // Detect the actual language used in first variant for UI feedback
     const detectedLanguage = await detectLanguageFromText(
-      variants[0] || reviewText
+      variants[0] || reviewText,
+      openai
     );
 
     return NextResponse.json({
@@ -186,7 +188,7 @@ function parseVariants(content: string): string[] {
 }
 
 /** Quick language detection using a cheap GPT call */
-async function detectLanguageFromText(text: string): Promise<string> {
+async function detectLanguageFromText(text: string, openai: OpenAI): Promise<string> {
   try {
     if (!text || text.length < 5) return "en";
     const res = await openai.chat.completions.create({

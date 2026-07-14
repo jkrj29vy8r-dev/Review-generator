@@ -196,11 +196,10 @@ export function BusinessesList() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: businesses.length * 0.08 }}
         >
+          <Link href="/businesses/new">
           <Card
             className="border-border/50 border-dashed bg-card/20 glass card-hover cursor-pointer h-full min-h-[280px] flex items-center justify-center"
-            asChild
           >
-            <Link href="/businesses/new">
               <CardContent className="text-center p-6">
                 <div className="w-14 h-14 rounded-2xl border-2 border-dashed border-border/50 flex items-center justify-center mx-auto mb-4 group-hover:border-brand-500/30 transition-colors">
                   <Plus className="w-6 h-6 text-muted-foreground" />
@@ -210,8 +209,8 @@ export function BusinessesList() {
                   Conectează un nou profil Google Business
                 </p>
               </CardContent>
-            </Link>
-          </Card>
+            </Card>
+          </Link>
         </motion.div>
       </div>
     </div>

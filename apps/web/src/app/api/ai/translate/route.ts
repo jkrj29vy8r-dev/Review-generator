@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs";
 import OpenAI from "openai";
 import { LANGUAGE_MAP } from "@/lib/languages";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 
 export async function POST(req: NextRequest) {
   const { userId } = auth();
@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const { text, targetLanguage, sourceLanguage } = await req.json();
 
   if (!text?.trim()) {

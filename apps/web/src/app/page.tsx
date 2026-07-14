@@ -357,7 +357,7 @@ function HeroSection() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay }}
               className="absolute"
-              style={pos as Record<string, string>}
+              style={pos as React.CSSProperties}
             >
               <motion.div
                 animate={{ y: [0, -6, 0] }}

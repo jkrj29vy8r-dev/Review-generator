@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
-});
-
 const PLANS = {
   PRO: process.env.STRIPE_PRO_PRICE_ID!,
   BUSINESS: process.env.STRIPE_BUSINESS_PRICE_ID!,
@@ -13,6 +9,10 @@ const PLANS = {
 };
 
 export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2026-06-24.dahlia",
+  });
+
   const { userId } = auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
