@@ -26,7 +26,7 @@ import {
 const adminStats = [
   { label: "Utilizatori Totali", value: "1,247", icon: Users, change: "+23 săptămâna aceasta", color: "text-brand-400", bg: "bg-brand-500/10" },
   { label: "Afaceri Active", value: "384", icon: Building2, change: "+8 azi", color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  { label: "Venituri Lunare", value: "18,450 lei", icon: CreditCard, change: "+12% față de luna trecută", color: "text-amber-400", bg: "bg-amber-500/10" },
+  { label: "Venituri Lunare", value: "€4,380", icon: CreditCard, change: "+12% față de luna trecută", color: "text-amber-400", bg: "bg-amber-500/10" },
   { label: "AI Tokens Folosiți", value: "4.2M", icon: Sparkles, change: "Luna aceasta", color: "text-violet-400", bg: "bg-violet-500/10" },
 ];
 

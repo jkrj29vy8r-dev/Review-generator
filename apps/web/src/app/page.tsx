@@ -82,7 +82,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "49",
+    price: "19",
     description: "Pentru afaceri active",
     features: ["Răspunsuri AI nelimitate", "Auto Reply activat", "AI Insights avansat", "3 locații", "Traduceri 100+ limbi", "Suport prioritar 24/7"],
     cta: "Alege Pro acum",
@@ -91,7 +91,7 @@ const plans = [
   },
   {
     name: "Business",
-    price: "149",
+    price: "49",
     description: "Lanțuri & grupuri",
     features: ["Tot ce e în Pro", "Locații nelimitate", "Echipă nelimitată", "API access + webhooks", "Rapoarte white-label", "Manager dedicat"],
     cta: "Contactează sales",
@@ -125,7 +125,7 @@ const testimonials = [
     color: "from-brand-400 to-violet-500",
   },
   {
-    text: "Cel mai bun tool SaaS din 2024. Design impecabil, funcționalitate perfectă.",
+    text: "Cel mai bun tool SaaS din 2026. Design impecabil, funcționalitate perfectă.",
     name: "Ionuț D.",
     role: "CEO, Clinica Zâmbetul",
     rating: 5,
@@ -709,8 +709,8 @@ function PricingSection() {
                   </div>
 
                   <div className="flex items-baseline gap-1 mb-6">
-                    <span className="text-5xl font-bold tracking-tight">{plan.price}</span>
-                    <span className="text-muted-foreground text-sm">lei/lună</span>
+                    <span className="text-muted-foreground text-2xl font-light mr-1">{plan.price !== "0" ? "€" : ""}</span><span className="text-5xl font-bold tracking-tight">{plan.price}</span>
+                    <span className="text-muted-foreground text-sm">€/lună</span>
                   </div>
 
                   <ul className="space-y-3 mb-7">
@@ -837,7 +837,7 @@ export default function LandingPage() {
             </div>
             <span className="font-semibold">AI Review Manager</span>
           </Link>
-          <p className="text-sm text-muted-foreground">© 2024 AI Review Manager. Toate drepturile rezervate.</p>
+          <p className="text-sm text-muted-foreground">© 2026 AI Review Manager. Toate drepturile rezervate.</p>
           <div className="flex gap-5 text-sm text-muted-foreground">
             {["Confidențialitate", "Termeni", "Contact"].map((link) => (
               <Link key={link} href={`/${link.toLowerCase()}`} className="hover:text-foreground transition-colors">

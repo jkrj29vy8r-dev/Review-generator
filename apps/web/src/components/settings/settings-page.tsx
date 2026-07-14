@@ -28,14 +28,14 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "49",
+    price: "19",
     current: true,
     popular: true,
     features: ["AI nelimitat", "Auto Reply", "AI Insights", "3 locații"],
   },
   {
     name: "Business",
-    price: "149",
+    price: "49",
     current: false,
     features: ["Tot din Pro", "Locații nelimitate", "API", "Echipă"],
   },
@@ -248,7 +248,7 @@ export function SettingsPage() {
                         )}
                       </div>
                       <p className="text-xl font-bold mt-1">
-                        {plan.price} lei
+                        €{plan.price}
                         <span className="text-sm font-normal text-muted-foreground">/lună</span>
                       </p>
                       <ul className="mt-2 space-y-1">

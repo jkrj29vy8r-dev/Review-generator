@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { I18nProvider } from "@/i18n/context";
 import { SmoothScroll } from "@/components/layout/smooth-scroll";
+import { LanguageChooserModal } from "@/components/ui/language-chooser-modal";
 import "./globals.css";
 
 const inter = Inter({
@@ -59,6 +60,7 @@ export default function RootLayout({
                 {children}
               </SmoothScroll>
               <Toaster />
+              <LanguageChooserModal />
             </I18nProvider>
           </ThemeProvider>
         </body>
