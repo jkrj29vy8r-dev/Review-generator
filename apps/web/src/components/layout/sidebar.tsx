@@ -60,18 +60,19 @@ export function Sidebar() {
         )}
       </AnimatePresence>
 
+      {/* Zero-width wrapper on mobile so sidebar doesn't shift layout */}
+      <div className="lg:contents w-0 lg:w-auto flex-shrink-0">
       <motion.aside
         initial={false}
         animate={{
-          x: isOpen ? 0 : -280,
+          x: isOpen ? 0 : -300,
           width: collapsed ? 64 : 256,
         }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-40 lg:z-auto",
+          "fixed lg:relative inset-y-0 left-0 z-40",
           "flex flex-col border-r border-border/40",
           "bg-card/40 glass",
-          "lg:translate-x-0 relative"
         )}
       >
         {/* Subtle gradient overlay */}
@@ -297,6 +298,7 @@ export function Sidebar() {
           </Link>
         </div>
       </motion.aside>
+      </div>
     </>
   );
 }
