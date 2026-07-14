@@ -44,3 +44,4 @@ Thumbs.db
 .vercel
 .turbo
 coverage/
+apps/web/tsconfig.tsbuildinfo
