@@ -8,7 +8,7 @@ import {
   LayoutDashboard, MessageSquare, Building2, BarChart3, Bell, Settings, Shield,
   Star, ChevronDown, Plus, Sparkles, ChevronLeft, ChevronRight, Zap,
 } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useSidebarStore } from "@/store/sidebar-store";
@@ -41,10 +41,13 @@ export function Sidebar() {
   const pathname = usePathname();
   const [businessExpanded, setBusinessExpanded] = useState(true);
   const [collapsed, setCollapsed] = useState(false);
-  const { isOpen } = useSidebarStore();
+  const { isOpen, close } = useSidebarStore();
   const { t } = useI18n();
 
   const toggleCollapse = useCallback(() => setCollapsed(v => !v), []);
+
+  // Close mobile sidebar on route change
+  useEffect(() => { close(); }, [pathname, close]);
 
   return (
     <>

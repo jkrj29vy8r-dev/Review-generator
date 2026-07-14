@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
-
   if (!WEBHOOK_SECRET) {
     return NextResponse.json({ error: "No webhook secret" }, { status: 500 });
   }
@@ -24,45 +24,52 @@ export async function POST(req: NextRequest) {
 
   const wh = new Webhook(WEBHOOK_SECRET);
   let evt: WebhookEvent;
-
   try {
     evt = wh.verify(body, {
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     }) as WebhookEvent;
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
   const { id } = evt.data;
   const eventType = evt.type;
 
-  if (eventType === "user.created") {
-    const { email_addresses, first_name, last_name, image_url } = evt.data as any;
-    const email = email_addresses?.[0]?.email_address;
-    const name = [first_name, last_name].filter(Boolean).join(" ");
-
-    // Create user in database
-    try {
-      const { prisma } = await import("@ai-review/database");
-      await prisma.user.create({
-        data: {
+  try {
+    if (eventType === "user.created") {
+      const { email_addresses, first_name, last_name, image_url } = evt.data as any;
+      const email = email_addresses?.[0]?.email_address;
+      const name = [first_name, last_name].filter(Boolean).join(" ");
+      await prisma.user.upsert({
+        where: { clerkId: id as string },
+        update: { email, name: name || undefined, avatarUrl: image_url || undefined },
+        create: {
           clerkId: id as string,
           email,
           name: name || undefined,
           avatarUrl: image_url || undefined,
-          subscription: {
-            create: {
-              plan: "FREE",
-              aiRepliesLimit: 30,
-            },
-          },
+          subscription: { create: { plan: "FREE", aiRepliesLimit: 30 } },
         },
       });
-    } catch (error) {
-      console.error("Error creating user:", error);
     }
+
+    if (eventType === "user.updated") {
+      const { email_addresses, first_name, last_name, image_url } = evt.data as any;
+      const email = email_addresses?.[0]?.email_address;
+      const name = [first_name, last_name].filter(Boolean).join(" ");
+      await prisma.user.update({
+        where: { clerkId: id as string },
+        data: { email, name: name || undefined, avatarUrl: image_url || undefined },
+      });
+    }
+
+    if (eventType === "user.deleted") {
+      await prisma.user.delete({ where: { clerkId: id as string } });
+    }
+  } catch (error) {
+    console.error(`Clerk webhook error for ${eventType}:`, error);
   }
 
   return NextResponse.json({ received: true });

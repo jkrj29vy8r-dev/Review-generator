@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs";
 import OpenAI from "openai";
+import { rateLimit } from "@/lib/rate-limit";
 import { getLanguageInstruction, LANGUAGE_MAP } from "@/lib/languages";
 
 
@@ -36,6 +37,36 @@ export async function POST(req: NextRequest) {
   const { userId } = auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Rate limit: 20 requests per minute per user
+  if (!rateLimit(`ai-reply:${userId}`, 20, 60_000)) {
+    return NextResponse.json({ error: "Prea multe cereri. Încearcă din nou în câteva secunde." }, { status: 429 });
+  }
+
+  // Quota enforcement
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      include: { subscription: true },
+    });
+    if (user?.subscription) {
+      const { aiRepliesUsed, aiRepliesLimit } = user.subscription;
+      if (aiRepliesLimit !== -1 && aiRepliesUsed >= aiRepliesLimit) {
+        return NextResponse.json(
+          { error: "Limita de răspunsuri AI atinsă. Upgrade la Pro pentru acces nelimitat." },
+          { status: 429 }
+        );
+      }
+      // Increment usage counter
+      await prisma.subscription.update({
+        where: { userId: user.id },
+        data: { aiRepliesUsed: { increment: 1 } },
+      });
+    }
+  } catch {
+    // DB unavailable - allow request to proceed (fail open for now)
   }
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });

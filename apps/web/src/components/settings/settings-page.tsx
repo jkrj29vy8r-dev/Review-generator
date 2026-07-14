@@ -56,6 +56,28 @@ export function SettingsPage() {
     manualApproval: false,
   });
 
+  const [profile, setProfile] = useState({ firstName: "", lastName: "" });
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
+
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    setSaveMsg("");
+    try {
+      const res = await fetch("/api/user/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: `${profile.firstName} ${profile.lastName}`.trim() }),
+      });
+      setSaveMsg(res.ok ? "Salvat cu succes!" : "Eroare la salvare.");
+    } catch {
+      setSaveMsg("Eroare la salvare.");
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSaveMsg(""), 3000);
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
@@ -93,20 +115,33 @@ export function SettingsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Prenume</Label>
-                  <Input placeholder="Ioan" className="border-border/50 bg-background/50" />
+                  <Input
+                    placeholder="Ioan"
+                    value={profile.firstName}
+                    onChange={(e) => setProfile(p => ({ ...p, firstName: e.target.value }))}
+                    className="border-border/50 bg-background/50"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Nume</Label>
-                  <Input placeholder="Popescu" className="border-border/50 bg-background/50" />
+                  <Input
+                    placeholder="Popescu"
+                    value={profile.lastName}
+                    onChange={(e) => setProfile(p => ({ ...p, lastName: e.target.value }))}
+                    className="border-border/50 bg-background/50"
+                  />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input type="email" placeholder="email@exemplu.ro" className="border-border/50 bg-background/50" />
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={handleSaveProfile}
+                  disabled={saving}
+                  className="bg-brand-500 hover:bg-brand-600 text-white border-0"
+                >
+                  {saving ? "Se salvează..." : "Salvează modificările"}
+                </Button>
+                {saveMsg && <span className="text-sm text-emerald-500">{saveMsg}</span>}
               </div>
-              <Button className="bg-brand-500 hover:bg-brand-600 text-white border-0">
-                Salvează modificările
-              </Button>
             </CardContent>
           </Card>
         </TabsContent>
