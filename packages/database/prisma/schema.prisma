@@ -1,0 +1,261 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  OPERATOR
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+  BUSINESS
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+  INACTIVE
+}
+
+enum ReviewSentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+enum ReplyTone {
+  PROFESIONAL
+  PRIETENOS
+  ELEGANT
+  PREMIUM
+  LUX
+  RESTAURANT
+  HOTEL
+  CLINICA
+  AUTO
+  SALON
+  CORPORATE
+  RELAXAT
+  AMUZANT
+  FORMAL
+}
+
+enum AutoReplyMode {
+  DISABLED
+  FIVE_STARS
+  FOUR_FIVE_STARS
+  MANUAL_APPROVAL
+}
+
+enum NotificationType {
+  NEW_REVIEW
+  REPLY_PUBLISHED
+  AUTO_REPLY_TRIGGERED
+  SUBSCRIPTION_CHANGE
+  TEAM_INVITE
+}
+
+// ─── User ────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String           @id @default(cuid())
+  clerkId       String           @unique
+  email         String           @unique
+  name          String?
+  avatarUrl     String?
+  role          UserRole         @default(OPERATOR)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  subscription  Subscription?
+  businesses    BusinessMember[]
+  notifications Notification[]
+  aiLogs        AILog[]
+  createdReplies ReviewReply[]
+}
+
+// ─── Subscription ────────────────────────────────────────────────────────────
+
+model Subscription {
+  id                  String             @id @default(cuid())
+  userId              String             @unique
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                SubscriptionPlan   @default(FREE)
+  status              SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  stripePriceId       String?
+  currentPeriodStart  DateTime?
+  currentPeriodEnd    DateTime?
+  aiRepliesUsed       Int                @default(0)
+  aiRepliesLimit      Int                @default(30)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+}
+
+// ─── Business ────────────────────────────────────────────────────────────────
+
+model Business {
+  id                    String           @id @default(cuid())
+  name                  String
+  type                  String           // restaurant, hotel, clinica, etc.
+  city                  String?
+  address               String?
+  phone                 String?
+  website               String?
+  logoUrl               String?
+  googleAccountId       String?
+  googleLocationId      String?
+  googleAccessToken     String?
+  googleRefreshToken    String?
+  googleTokenExpiry     DateTime?
+  autoReplyMode         AutoReplyMode    @default(DISABLED)
+  defaultTone           ReplyTone        @default(PROFESIONAL)
+  customPromptSuffix    String?
+  totalReviews          Int              @default(0)
+  averageRating         Float            @default(0)
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  members               BusinessMember[]
+  reviews               Review[]
+  locations             BusinessLocation[]
+}
+
+model BusinessLocation {
+  id              String    @id @default(cuid())
+  businessId      String
+  business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name            String
+  address         String?
+  googleLocationId String?
+  totalReviews    Int       @default(0)
+  averageRating   Float     @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  reviews         Review[]
+}
+
+model BusinessMember {
+  id         String    @id @default(cuid())
+  businessId String
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       UserRole  @default(OPERATOR)
+  createdAt  DateTime  @default(now())
+
+  @@unique([businessId, userId])
+}
+
+// ─── Review ──────────────────────────────────────────────────────────────────
+
+model Review {
+  id               String           @id @default(cuid())
+  businessId       String
+  business         Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  locationId       String?
+  location         BusinessLocation? @relation(fields: [locationId], references: [id])
+  googleReviewId   String?          @unique
+  authorName       String?
+  authorPhotoUrl   String?
+  rating           Int
+  text             String?
+  sentiment        ReviewSentiment  @default(NEUTRAL)
+  sentimentScore   Float            @default(0)
+  isReplied        Boolean          @default(false)
+  isAutoReplied    Boolean          @default(false)
+  reviewDate       DateTime
+  syncedAt         DateTime         @default(now())
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  replies          ReviewReply[]
+  aiGenerations    AIGeneration[]
+}
+
+// ─── Review Reply ─────────────────────────────────────────────────────────────
+
+model ReviewReply {
+  id             String       @id @default(cuid())
+  reviewId       String
+  review         Review       @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdById    String?
+  createdBy      User?        @relation(fields: [createdById], references: [id])
+  text           String
+  tone           ReplyTone    @default(PROFESIONAL)
+  isPublished    Boolean      @default(false)
+  publishedAt    DateTime?
+  googleReplyId  String?
+  isAutoReply    Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+// ─── AI Generation ────────────────────────────────────────────────────────────
+
+model AIGeneration {
+  id          String     @id @default(cuid())
+  reviewId    String
+  review      Review     @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  prompt      String
+  variants    Json       // array of generated text variants
+  tone        ReplyTone  @default(PROFESIONAL)
+  model       String     @default("gpt-4o")
+  tokensUsed  Int        @default(0)
+  createdAt   DateTime   @default(now())
+}
+
+// ─── AI Log ──────────────────────────────────────────────────────────────────
+
+model AILog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action      String
+  model       String
+  tokensIn    Int      @default(0)
+  tokensOut   Int      @default(0)
+  cost        Float    @default(0)
+  latencyMs   Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+// ─── Notification ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  data      Json?
+  createdAt DateTime         @default(now())
+}
+
+// ─── Rating History ───────────────────────────────────────────────────────────
+
+model RatingHistory {
+  id          String   @id @default(cuid())
+  businessId  String
+  rating      Float
+  totalReviews Int
+  recordedAt  DateTime @default(now())
+}
