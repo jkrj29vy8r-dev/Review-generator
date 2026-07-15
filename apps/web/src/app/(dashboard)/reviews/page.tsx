@@ -1,6 +1,5 @@
 import { Metadata } from "next";
-import { ReviewsList } from "@/components/reviews/reviews-list";
-import { ReviewsFilters } from "@/components/reviews/reviews-filters";
+import { ReviewsContainer } from "@/components/reviews/reviews-container";
 
 export const metadata: Metadata = { title: "Recenzii" };
 
@@ -15,8 +14,7 @@ export default function ReviewsPage() {
           </p>
         </div>
       </div>
-      <ReviewsFilters />
-      <ReviewsList />
+      <ReviewsContainer />
     </div>
   );
 }

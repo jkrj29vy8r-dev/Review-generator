@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     if (filter === "positive") where.rating = { gte: 4 };
     if (search) {
       where.OR = [
-        { reviewText: { contains: search, mode: "insensitive" } },
+        { text: { contains: search, mode: "insensitive" } },
         { authorName: { contains: search, mode: "insensitive" } },
       ];
     }

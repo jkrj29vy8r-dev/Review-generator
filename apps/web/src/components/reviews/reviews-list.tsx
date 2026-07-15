@@ -1,94 +1,145 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { ReviewCard } from "./review-card";
 import { AIReplyDialog } from "@/components/ai/ai-reply-dialog";
 
-const mockReviews = [
-  {
-    id: "1",
-    author: "Maria Ionescu",
-    initials: "MI",
-    rating: 5,
-    text: "Cel mai bun restaurant din București! Mâncarea a fost delicioasă, personalul foarte amabil. Cu siguranță revin!",
-    date: "acum 2 ore",
-    replied: false,
-    sentiment: "positive" as const,
-    business: "Restaurant La Bunica",
-    businessType: "restaurant",
-    city: "București",
-  },
-  {
-    id: "2",
-    author: "Alexandru Popescu",
-    initials: "AP",
-    rating: 4,
-    text: "Mâncare foarte bună, prețuri ok. Singurul minus a fost că am așteptat puțin mai mult pentru comandă. Altfel, totul perfect.",
-    date: "acum 5 ore",
-    replied: true,
-    replyText: "Bună ziua, Alexandru! Vă mulțumim pentru feedback sincer. Apreciem că v-ați bucurat de mâncare și ne pare rău pentru așteptare. Lucrăm la îmbunătățirea timpilor de servire.",
-    sentiment: "positive" as const,
-    business: "Restaurant La Bunica",
-    businessType: "restaurant",
-    city: "București",
-  },
-  {
-    id: "3",
-    author: "Elena Dumitrescu",
-    initials: "ED",
-    rating: 2,
-    text: "Am fost dezamăgit. Mâncarea a venit rece și chelnerul nu a fost deloc atent. Sper să se îmbunătățească.",
-    date: "ieri",
-    replied: false,
-    sentiment: "negative" as const,
-    business: "Clinică Zâmbetul",
-    businessType: "clinica",
-    city: "Cluj",
-  },
-  {
-    id: "4",
-    author: "Ion Gheorghe",
-    initials: "IG",
-    rating: 5,
-    text: "Atmosferă superbă! Am celebrat ziua de naștere a soției și totul a fost perfect. Recomand cu căldură!",
-    date: "2 zile în urmă",
-    replied: true,
-    replyText: "Bună ziua, Ion! Ne bucurăm enorm că ați ales restaurantul nostru pentru o ocazie atât de specială. Sper că ziua de naștere a soției a fost memorabilă!",
-    sentiment: "positive" as const,
-    business: "Hotel Panoramic",
-    businessType: "hotel",
-    city: "Sinaia",
-  },
-  {
-    id: "5",
-    author: "Andreea Stancu",
-    initials: "AS",
-    rating: 3,
-    text: "Mâncare ok, dar nu am fost impresionată. Prețurile sunt puțin mari față de calitate. Poate mai vizitez.",
-    date: "3 zile în urmă",
-    replied: false,
-    sentiment: "neutral" as const,
-    business: "Restaurant La Bunica",
-    businessType: "restaurant",
-    city: "București",
-  },
-];
+interface ApiReview {
+  id: string;
+  authorName: string;
+  authorPhotoUrl: string | null;
+  rating: number;
+  text: string;
+  reviewDate: string;
+  isReplied: boolean;
+  business: { name: string; type: string; city: string };
+  replies: { text: string }[];
+}
 
-export function ReviewsList() {
-  const [selectedReview, setSelectedReview] = useState<typeof mockReviews[0] | null>(null);
+interface NormalizedReview {
+  id: string;
+  author: string;
+  initials: string;
+  rating: number;
+  text: string;
+  date: string;
+  replied: boolean;
+  replyText?: string;
+  sentiment: "positive" | "neutral" | "negative";
+  business: string;
+  businessType: string;
+  city: string;
+}
+
+function getSentiment(rating: number): "positive" | "neutral" | "negative" {
+  if (rating >= 4) return "positive";
+  if (rating <= 2) return "negative";
+  return "neutral";
+}
+
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - d.getTime()) / 1000);
+  if (diff < 3600) return `acum ${Math.floor(diff / 60)} minute`;
+  if (diff < 86400) return `acum ${Math.floor(diff / 3600)} ore`;
+  if (diff < 172800) return "ieri";
+  return `${Math.floor(diff / 86400)} zile în urmă`;
+}
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+function normalizeReview(r: ApiReview): NormalizedReview {
+  return {
+    id: r.id,
+    author: r.authorName,
+    initials: getInitials(r.authorName),
+    rating: r.rating,
+    text: r.text,
+    date: formatDate(r.reviewDate),
+    replied: r.isReplied,
+    replyText: r.replies?.[0]?.text,
+    sentiment: getSentiment(r.rating),
+    business: r.business?.name ?? "",
+    businessType: r.business?.type ?? "",
+    city: r.business?.city ?? "",
+  };
+}
+
+interface ReviewsListProps {
+  filter?: string;
+  search?: string;
+}
+
+export function ReviewsList({ filter = "all", search = "" }: ReviewsListProps) {
+  const [reviews, setReviews] = useState<NormalizedReview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedReview, setSelectedReview] = useState<NormalizedReview | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const handleGenerateReply = (review: typeof mockReviews[0]) => {
-    setSelectedReview(review);
-    setDialogOpen(true);
+  useEffect(() => {
+    setLoading(true);
+    const params = new URLSearchParams({ filter, search });
+    fetch(`/api/reviews?${params}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data?.reviews)) {
+          setReviews(data.reviews.map(normalizeReview));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [filter, search]);
+
+  const handleDialogClose = (open: boolean) => {
+    setDialogOpen(open);
+    if (!open) {
+      // Refresh list to pick up newly published replies
+      const params = new URLSearchParams({ filter, search });
+      fetch(`/api/reviews?${params}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data?.reviews)) {
+            setReviews(data.reviews.map(normalizeReview));
+          }
+        })
+        .catch(() => {});
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (reviews.length === 0) {
+    return (
+      <div className="text-center py-20 text-muted-foreground">
+        <p className="text-sm">Nu există recenzii{filter !== "all" ? " pentru acest filtru" : ""}.</p>
+        {filter === "all" && (
+          <p className="text-xs mt-1">Conectează un cont Google Business și sincronizează recenziile.</p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="space-y-3">
         <AnimatePresence>
-          {mockReviews.map((review, i) => (
+          {reviews.map((review, i) => (
             <motion.div
               key={review.id}
               initial={{ opacity: 0, y: 10 }}
@@ -97,7 +148,10 @@ export function ReviewsList() {
             >
               <ReviewCard
                 review={review}
-                onGenerateReply={() => handleGenerateReply(review)}
+                onGenerateReply={() => {
+                  setSelectedReview(review);
+                  setDialogOpen(true);
+                }}
               />
             </motion.div>
           ))}
@@ -107,7 +161,7 @@ export function ReviewsList() {
       {selectedReview && (
         <AIReplyDialog
           open={dialogOpen}
-          onOpenChange={setDialogOpen}
+          onOpenChange={handleDialogClose}
           review={selectedReview}
         />
       )}
