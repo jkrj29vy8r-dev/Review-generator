@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { MessageSquare, Star, CheckCircle2, AlertCircle, TrendingUp, Building2 } from "lucide-react";
+import { MessageSquare, Star, AlertCircle, Building2 } from "lucide-react";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { TiltCard } from "@/components/ui/tilt-card";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/context";
+import type { TranslationKey } from "@/i18n/translations";
 
 interface DashboardData {
   totalReviews: number;
@@ -14,10 +16,26 @@ interface DashboardData {
   businessCount: number;
 }
 
-const statConfigs = [
+interface StatConfig {
+  key: keyof DashboardData;
+  titleKey: TranslationKey;
+  changeKey: TranslationKey;
+  suffix: string;
+  decimals?: number;
+  icon: React.ElementType;
+  gradient: string;
+  glow: string;
+  bg: string;
+  iconColor: string;
+  border: string;
+  changeType: "positive" | "negative";
+}
+
+const statConfigs: StatConfig[] = [
   {
-    key: "totalReviews" as const,
-    title: "Total Recenzii",
+    key: "totalReviews",
+    titleKey: "dashboard.totalReviews",
+    changeKey: "dashboard.totalReviewsChange",
     suffix: "",
     icon: MessageSquare,
     gradient: "from-brand-500 to-brand-600",
@@ -25,12 +43,12 @@ const statConfigs = [
     bg: "from-brand-500/15 to-brand-600/5",
     iconColor: "text-brand-400",
     border: "border-brand-500/20",
-    change: "recenzii totale",
-    changeType: "positive" as const,
+    changeType: "positive",
   },
   {
-    key: "avgRating" as const,
-    title: "Rating Mediu",
+    key: "avgRating",
+    titleKey: "dashboard.avgRating",
+    changeKey: "dashboard.avgRatingChange",
     suffix: "★",
     decimals: 1,
     icon: Star,
@@ -39,12 +57,12 @@ const statConfigs = [
     bg: "from-amber-500/15 to-orange-500/5",
     iconColor: "text-amber-400",
     border: "border-amber-500/20",
-    change: "din 5 stele",
-    changeType: "positive" as const,
+    changeType: "positive",
   },
   {
-    key: "unanswered" as const,
-    title: "Nerăspunse",
+    key: "unanswered",
+    titleKey: "dashboard.unanswered",
+    changeKey: "dashboard.unansweredChange",
     suffix: "",
     icon: AlertCircle,
     gradient: "from-rose-500 to-red-500",
@@ -52,12 +70,12 @@ const statConfigs = [
     bg: "from-rose-500/15 to-red-500/5",
     iconColor: "text-rose-400",
     border: "border-rose-500/20",
-    change: "necesită atenție",
-    changeType: "negative" as const,
+    changeType: "negative",
   },
   {
-    key: "businessCount" as const,
-    title: "Afaceri",
+    key: "businessCount",
+    titleKey: "businesses.title",
+    changeKey: "businesses.connectedChange",
     suffix: "",
     icon: Building2,
     gradient: "from-emerald-500 to-teal-500",
@@ -65,12 +83,12 @@ const statConfigs = [
     bg: "from-emerald-500/15 to-teal-500/5",
     iconColor: "text-emerald-400",
     border: "border-emerald-500/20",
-    change: "afaceri conectate",
-    changeType: "positive" as const,
+    changeType: "positive",
   },
 ];
 
 export function DashboardStats() {
+  const { t } = useI18n();
   const [data, setData] = useState<DashboardData | null>(null);
 
   useEffect(() => {
@@ -88,7 +106,7 @@ export function DashboardStats() {
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {statConfigs.map((stat, i) => (
         <motion.div
-          key={stat.title}
+          key={stat.titleKey}
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: i * 0.07, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
@@ -113,11 +131,11 @@ export function DashboardStats() {
               </div>
 
               <div className="space-y-0.5">
-                <p className="text-[11px] text-muted-foreground font-medium leading-tight">{stat.title}</p>
+                <p className="text-[11px] text-muted-foreground font-medium leading-tight">{t(stat.titleKey)}</p>
                 <p className="text-2xl font-bold tabular-nums tracking-tight flex items-baseline gap-0.5">
                   <AnimatedCounter
                     value={getValue(stat.key) as number}
-                    decimals={"decimals" in stat ? stat.decimals ?? 0 : 0}
+                    decimals={stat.decimals ?? 0}
                     duration={1500}
                     className={stat.suffix === "★" ? "text-amber-400" : ""}
                   />
@@ -128,7 +146,7 @@ export function DashboardStats() {
                   )}
                 </p>
                 <p className={cn("text-[11px] leading-tight", stat.changeType === "positive" ? "text-emerald-500" : "text-rose-400")}>
-                  {stat.change}
+                  {t(stat.changeKey)}
                 </p>
               </div>
 

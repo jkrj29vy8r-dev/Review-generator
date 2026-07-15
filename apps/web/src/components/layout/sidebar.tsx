@@ -31,18 +31,30 @@ const navItems: {
   { labelKey: "nav.admin", href: "/admin", icon: Shield, gradient: "from-violet-500 to-purple-600" },
 ];
 
-const businesses = [
-  { name: "Restaurant La Bunica", initial: "R", color: "from-amber-500 to-orange-500", active: true },
-  { name: "Hotel Panoramic", initial: "H", color: "from-sky-500 to-blue-500", active: false },
-  { name: "Clinică Zâmbetul", initial: "C", color: "from-emerald-500 to-teal-500", active: false },
+const BIZ_COLORS = [
+  "from-amber-500 to-orange-500",
+  "from-sky-500 to-blue-500",
+  "from-emerald-500 to-teal-500",
+  "from-purple-500 to-violet-500",
+  "from-rose-500 to-pink-500",
 ];
+
+interface SidebarBusiness { id: string; name: string }
 
 export function Sidebar() {
   const pathname = usePathname();
   const [businessExpanded, setBusinessExpanded] = useState(true);
   const [collapsed, setCollapsed] = useState(false);
+  const [businesses, setBusinesses] = useState<SidebarBusiness[]>([]);
   const { isOpen, close } = useSidebarStore();
   const { t } = useI18n();
+
+  useEffect(() => {
+    fetch("/api/businesses")
+      .then((r) => r.json())
+      .then((d) => { if (Array.isArray(d?.businesses)) setBusinesses(d.businesses); })
+      .catch(() => {});
+  }, []);
 
   const toggleCollapse = useCallback(() => setCollapsed(v => !v), []);
 
@@ -246,32 +258,24 @@ export function Sidebar() {
                       className="overflow-hidden mt-1"
                     >
                       <div className="space-y-0.5">
-                        {businesses.map((biz) => (
+                        {businesses.map((biz, i) => (
                           <Link
-                            key={biz.name}
-                            href={`/businesses/${encodeURIComponent(biz.name)}`}
-                            className={cn(
-                              "flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all",
-                              biz.active
-                                ? "bg-muted/60 text-foreground"
-                                : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                            )}
+                            key={biz.id}
+                            href={`/businesses`}
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all text-muted-foreground hover:text-foreground hover:bg-muted/40"
                           >
-                            <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${biz.color} flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0`}>
-                              {biz.initial}
+                            <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${BIZ_COLORS[i % BIZ_COLORS.length]} flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0`}>
+                              {biz.name[0]?.toUpperCase()}
                             </div>
                             <span className="truncate">{biz.name}</span>
-                            {biz.active && (
-                              <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
-                            )}
                           </Link>
                         ))}
-                        <button className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all border border-dashed border-border/50 hover:border-brand-500/30 mt-1">
+                        <Link href="/businesses/new" className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all border border-dashed border-border/50 hover:border-brand-500/30 mt-1">
                           <div className="w-6 h-6 rounded-lg border border-dashed border-border flex items-center justify-center">
                             <Plus className="w-3 h-3" />
                           </div>
                           Adaugă afacere
-                        </button>
+                        </Link>
                       </div>
                     </motion.div>
                   )}
