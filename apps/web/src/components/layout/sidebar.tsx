@@ -274,7 +274,7 @@ export function Sidebar() {
                           <div className="w-6 h-6 rounded-lg border border-dashed border-border flex items-center justify-center">
                             <Plus className="w-3 h-3" />
                           </div>
-                          Adaugă afacere
+                          {t("businesses.add")}
                         </Link>
                       </div>
                     </motion.div>

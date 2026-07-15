@@ -62,12 +62,12 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold mb-3">Bun venit la Replai! 👋</h1>
+        <h1 className="text-3xl font-bold mb-3">{t("dashboard.emptyState")}</h1>
         <p className="text-muted-foreground text-lg mb-2 max-w-md">
-          Conectează-ți profilul Google Business pentru a vedea recenziile și a genera răspunsuri AI.
+          {t("dashboard.emptyStateDesc")}
         </p>
         <p className="text-muted-foreground/60 text-sm mb-8 max-w-sm">
-          Setup durează mai puțin de 2 minute. Recenziile tale vor apărea automat.
+          {t("dashboard.connectGoogleDesc")}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3">
@@ -78,29 +78,15 @@ export default function DashboardPage() {
           >
             <Link href="/businesses/new">
               <Globe className="w-5 h-5 mr-2" />
-              Conectează Google Business
+              {t("dashboard.connectGoogle")}
             </Link>
           </Button>
           <Button size="lg" variant="outline" className="border-border/50 h-12" asChild>
             <Link href="/businesses">
               <Building2 className="w-5 h-5 mr-2" />
-              Adaugă afacere manual
+              {t("businesses.add")}
             </Link>
           </Button>
-        </div>
-
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl w-full">
-          {[
-            { icon: "🔄", title: "Sincronizare automată", desc: "Recenziile noi apar instant" },
-            { icon: "🤖", title: "Răspunsuri AI", desc: "GPT-4o generează 3 variante" },
-            { icon: "🌍", title: "17 limbi", desc: "Detectare automată a limbii" },
-          ].map((item) => (
-            <div key={item.title} className="p-4 rounded-2xl border border-border/40 bg-card/40 text-center">
-              <div className="text-2xl mb-2">{item.icon}</div>
-              <p className="font-medium text-sm">{item.title}</p>
-              <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
-            </div>
-          ))}
         </div>
       </motion.div>
     );

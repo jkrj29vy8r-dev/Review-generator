@@ -51,10 +51,10 @@ export function RecentReviews() {
   return (
     <Card className="border-border/40 bg-card/40 glass h-full">
       <CardHeader className="flex flex-row items-center justify-between pb-3 pt-4 px-4">
-        <CardTitle className="text-sm font-semibold">Recenzii Recente</CardTitle>
+        <CardTitle className="text-sm font-semibold">{t("reviews.recentTitle")}</CardTitle>
         <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1" asChild>
           <Link href="/reviews">
-            Vezi toate
+            {t("reviews.viewAll")}
             <ExternalLink className="w-3 h-3" />
           </Link>
         </Button>
@@ -68,10 +68,10 @@ export function RecentReviews() {
         ) : reviews.length === 0 ? (
           <div className="text-center py-8">
             <Building2 className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">Nicio recenzie încă</p>
-            <p className="text-xs text-muted-foreground/70 mt-1">Conectează Google Business și sincronizează</p>
+            <p className="text-sm text-muted-foreground">{t("reviews.noReviews")}</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">{t("reviews.noReviewsDesc")}</p>
             <Button size="sm" className="mt-3 bg-brand-500 hover:bg-brand-600 text-white border-0 text-xs" asChild>
-              <Link href="/businesses">Conectează acum</Link>
+              <Link href="/businesses">{t("businesses.connect")}</Link>
             </Button>
           </div>
         ) : (
@@ -107,12 +107,12 @@ export function RecentReviews() {
                       {review.isReplied ? (
                         <Badge className="bg-emerald-500/10 text-emerald-400 border-0 text-[10px] px-1.5 py-0 h-4">
                           <CheckCircle2 className="w-2.5 h-2.5 mr-0.5" />
-                          Răspuns
+                          {t("reviews.replied_badge")}
                         </Badge>
                       ) : (
                         <Badge className="bg-amber-500/10 text-amber-400 border-0 text-[10px] px-1.5 py-0 h-4">
                           <Clock className="w-2.5 h-2.5 mr-0.5" />
-                          Nerăspuns
+                          {t("reviews.unanswered_badge")}
                         </Badge>
                       )}
                     </div>
