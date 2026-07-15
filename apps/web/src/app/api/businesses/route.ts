@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         phone: phone || null,
         website: website || null,
         members: {
-          create: { userId: user.id, role: "OWNER" },
+          create: { userId: user.id, role: "ADMIN" },
         },
       },
     });

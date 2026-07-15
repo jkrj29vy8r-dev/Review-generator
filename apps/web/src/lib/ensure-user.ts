@@ -19,7 +19,6 @@ export async function ensureUser(clerkId: string) {
       clerkId,
       email,
       name,
-      plan: "FREE",
     },
   });
 }
