@@ -1,6 +1,40 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs";
 import { prisma } from "@/lib/prisma";
+
+export async function POST(req: NextRequest) {
+  const { userId } = auth();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { name, type, city, address, phone, website } = await req.json();
+  if (!name || !type || !city) {
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    const business = await prisma.business.create({
+      data: {
+        name,
+        type,
+        city,
+        address: address || null,
+        phone: phone || null,
+        website: website || null,
+        members: {
+          create: { userId: user.id, role: "OWNER" },
+        },
+      },
+    });
+
+    return NextResponse.json({ business });
+  } catch (error: any) {
+    console.error("Create business error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
 
 export async function GET() {
   const { userId } = auth();
