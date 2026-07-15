@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs";
 import { prisma } from "@/lib/prisma";
+import { ensureUser } from "@/lib/ensure-user";
 
 export async function GET() {
   const { userId } = auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
+    await ensureUser(userId);
+
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
       include: {
@@ -23,7 +26,7 @@ export async function GET() {
       },
     });
 
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!user) return NextResponse.json({ totalReviews: 0, unanswered: 0, avgRating: 0, businessCount: 0 });
 
     const allBusinesses = user.businesses.map((bm: any) => bm.business);
     const allReviews = allBusinesses.flatMap((b: any) => b.reviews);

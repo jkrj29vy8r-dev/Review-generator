@@ -6,6 +6,7 @@ import {
   refreshAccessToken,
   starRatingToNumber,
 } from "@/lib/google";
+import { ensureUser } from "@/lib/ensure-user";
 
 export async function POST(req: NextRequest) {
   const { userId } = auth();
@@ -15,8 +16,7 @@ export async function POST(req: NextRequest) {
   if (!businessId) return NextResponse.json({ error: "Missing businessId" }, { status: 400 });
 
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const user = await ensureUser(userId);
 
     // Verify user owns this business
     const membership = await prisma.businessMember.findFirst({

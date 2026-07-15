@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs";
 import { prisma } from "@/lib/prisma";
 import { postGoogleReply, refreshAccessToken } from "@/lib/google";
+import { ensureUser } from "@/lib/ensure-user";
 
 export async function POST(req: NextRequest) {
   const { userId } = auth();
@@ -13,8 +14,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const user = await ensureUser(userId);
 
     const review = await prisma.review.findUnique({
       where: { id: reviewId },

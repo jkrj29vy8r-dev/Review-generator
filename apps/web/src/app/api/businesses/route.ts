@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs";
 import { prisma } from "@/lib/prisma";
+import { ensureUser } from "@/lib/ensure-user";
 
 export async function POST(req: NextRequest) {
   const { userId } = auth();
@@ -12,8 +13,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const user = await ensureUser(userId);
 
     const business = await prisma.business.create({
       data: {
@@ -41,8 +41,7 @@ export async function GET() {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-    if (!user) return NextResponse.json({ businesses: [] });
+    const user = await ensureUser(userId);
 
     const members = await prisma.businessMember.findMany({
       where: { userId: user.id },

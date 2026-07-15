@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs";
 import { prisma } from "@/lib/prisma";
+import { ensureUser } from "@/lib/ensure-user";
 
 export async function GET(req: NextRequest) {
   const { userId } = auth();
@@ -13,8 +14,7 @@ export async function GET(req: NextRequest) {
   const limit = 20;
 
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-    if (!user) return NextResponse.json({ reviews: [], total: 0 });
+    const user = await ensureUser(userId);
 
     const members = await prisma.businessMember.findMany({
       where: { userId: user.id },
