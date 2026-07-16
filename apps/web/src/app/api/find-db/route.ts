@@ -1,24 +1,37 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 
 export const maxDuration = 30;
+export const dynamic = "force-dynamic";
 
-const PROJECT = "vvluuegrolplpmoaajyq";
-const PASS = "Narcis.24.05.06";
+export async function GET() {
+  const url = process.env.DATABASE_URL?.trim() ?? "NOT SET";
+  const masked = url.replace(/:([^:@\n\r]+)@/, ":***@");
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const region = searchParams.get("region") || "eu-west-1";
-
-  const url = `postgresql://postgres.${PROJECT}:${PASS}@aws-0-${region}.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&connect_timeout=5`;
-  const client = new PrismaClient({ datasourceUrl: url });
-
+  // Test Supabase REST API - does not need DB connection
+  let supabaseOk = false;
+  let supabaseError = "";
   try {
-    await client.$queryRaw`SELECT 1 as ok`;
-    return NextResponse.json({ region, status: "WORKS", url: url.replace(PASS, "***") });
+    const apiUrl = "https://vvluuegrolplpmoaajyq.supabase.co/rest/v1/User?limit=1";
+    const res = await fetch(apiUrl, {
+      headers: {
+        "apikey": process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
+        "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY ?? ""}`,
+      },
+    });
+    supabaseOk = res.status < 500;
+    supabaseError = `status=${res.status}`;
   } catch (e: any) {
-    return NextResponse.json({ region, status: "FAILED", error: e.message?.slice(0, 200), url: url.replace(PASS, "***") });
-  } finally {
-    await client.$disconnect().catch(() => {});
+    supabaseError = e.message;
   }
+
+  return NextResponse.json({
+    databaseUrl: masked,
+    supabaseApiReachable: supabaseOk,
+    supabaseStatus: supabaseError,
+    env: {
+      hasDbUrl: !!process.env.DATABASE_URL,
+      hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    },
+  });
 }
